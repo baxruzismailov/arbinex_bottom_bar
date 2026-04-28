@@ -46,4 +46,30 @@ void main() {
     await tester.pump();
     expect(selectedIndex, 99);
   });
+
+  testWidgets('supports multiline labels', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          bottomNavigationBar: ArbinexBottomBar(
+            items: const [
+              BottomActionBarItem(
+                icon: Icon(Icons.home),
+                label: 'Ana Sehife',
+                labelMaxLines: 2,
+                labelSoftWrap: true,
+                labelOverflow: TextOverflow.visible,
+              ),
+              BottomActionBarItem(icon: Icon(Icons.task), label: 'Tapsiriqlar'),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    final label = tester.widget<Text>(find.text('Ana Sehife'));
+    expect(label.maxLines, 2);
+    expect(label.softWrap, isTrue);
+    expect(label.overflow, TextOverflow.visible);
+  });
 }

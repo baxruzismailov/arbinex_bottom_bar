@@ -14,6 +14,10 @@ class BottomActionBarItem {
     this.inactiveLabelStyle,
     this.iconSize = 24,
     this.semanticLabel,
+    this.labelMaxLines = 1,
+    this.labelSoftWrap = false,
+    this.labelOverflow = TextOverflow.ellipsis,
+    this.labelTextAlign = TextAlign.center,
   });
 
   final Widget icon;
@@ -26,6 +30,10 @@ class BottomActionBarItem {
   final TextStyle? inactiveLabelStyle;
   final double iconSize;
   final String? semanticLabel;
+  final int labelMaxLines;
+  final bool labelSoftWrap;
+  final TextOverflow labelOverflow;
+  final TextAlign labelTextAlign;
 }
 
 class BottomActionBarCenterItem {
@@ -368,9 +376,10 @@ class _BarItemButton extends StatelessWidget {
               Flexible(
                 child: Text(
                   item.label,
-                  maxLines: 1,
-                  softWrap: false,
-                  overflow: TextOverflow.ellipsis,
+                  textAlign: item.labelTextAlign,
+                  maxLines: item.labelMaxLines,
+                  softWrap: item.labelSoftWrap,
+                  overflow: item.labelOverflow,
                   style: isSelected
                       ? (activeLabelStyle ?? defaultActiveLabelStyle)
                       : (labelStyle ?? defaultLabelStyle),
