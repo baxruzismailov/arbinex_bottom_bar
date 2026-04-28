@@ -35,7 +35,7 @@ void main() {
     expect(find.text('Profile'), findsOneWidget);
     expect(
       tester.widget<Text>(find.text('Search')).style?.fontWeight,
-      FontWeight.w700,
+      FontWeight.w600,
     );
 
     await tester.tap(find.text('Tasks'));

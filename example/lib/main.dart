@@ -35,6 +35,16 @@ class _DemoScreenState extends State<DemoScreen> {
     return const BottomActionBarItem(
       icon: Icon(Icons.home_rounded),
       label: 'Ana Səhifə',
+      activeLabelStyle: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        color: Colors.white,
+      ),
+      inactiveLabelStyle: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        color: Color(0xFF8A8A8A),
+      ),
     );
   }
 
@@ -42,6 +52,16 @@ class _DemoScreenState extends State<DemoScreen> {
     return const BottomActionBarItem(
       icon: Icon(Icons.dashboard_customize_outlined),
       label: 'Layihələr',
+      activeLabelStyle: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        color: Colors.white,
+      ),
+      inactiveLabelStyle: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        color: Color(0xFF8A8A8A),
+      ),
     );
   }
 
@@ -49,6 +69,16 @@ class _DemoScreenState extends State<DemoScreen> {
     return const BottomActionBarItem(
       icon: Icon(Icons.list_alt_rounded),
       label: 'Tapşırıqlar',
+      activeLabelStyle: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        color: Colors.white,
+      ),
+      inactiveLabelStyle: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        color: Color(0xFF8A8A8A),
+      ),
     );
   }
 
@@ -56,14 +86,25 @@ class _DemoScreenState extends State<DemoScreen> {
     return const BottomActionBarItem(
       icon: Icon(Icons.person_outline_rounded),
       label: 'Profilim',
+      activeLabelStyle: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        color: Colors.white,
+      ),
+      inactiveLabelStyle: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        color: Color(0xFF8A8A8A),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       body: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(20, 72, 20, 140),
+        padding: const EdgeInsets.fromLTRB(16, 32, 16, 160),
         itemCount: 5,
         separatorBuilder: (_, _) => const SizedBox(height: 16),
         itemBuilder: (_, index) => Container(
@@ -147,30 +188,42 @@ class _DemoScreenState extends State<DemoScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: CustomBottomActionBar(
-        backgroundColor: const Color(0xFF252525),
+      bottomNavigationBar: ArbinexBottomBar(
+        backgroundColor: const Color(0xFF262626),
         currentIndex: currentIndex,
         initialActiveIndex: 2,
-        height: 82,
+        height: 76,
+        horizontalPadding: 10,
+        notchMargin: 8,
+        notchDepth: 24,
+        itemVerticalPadding: const EdgeInsets.fromLTRB(6, 6, 6, 12),
         activeColor: Colors.white,
-        inactiveColor: const Color(0xFF8F8F8F),
+        inactiveColor: const Color(0xFF8A8A8A),
         shadow: const [
           BoxShadow(
-            color: Color(0x22000000),
-            blurRadius: 24,
-            offset: Offset(0, -6),
+            color: Color(0x1A000000),
+            blurRadius: 28,
+            offset: Offset(0, -8),
           ),
         ],
         centerAction: BottomActionBarCenterItem(
-          top: 0,
-          size: 72,
-          backgroundColor: const Color(0xFF5E63F2),
-          borderWidth: 5,
+          top: -18,
+          size: 88,
+          backgroundColor: const Color(0xFF6460F1),
+          borderColor: Colors.white,
+          borderWidth: 6,
           semanticLabel: 'Biometric action',
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x2A5E63F2),
+              blurRadius: 24,
+              offset: Offset(0, 10),
+            ),
+          ],
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () => _showMessage('Center action clicked'),
-            child: const Icon(Icons.fingerprint, color: Colors.white, size: 32),
+            child: const Icon(Icons.fingerprint, color: Colors.white, size: 42),
           ),
         ),
         items: [homePage(), projectsPage(), tasksPage(), accountPage()],

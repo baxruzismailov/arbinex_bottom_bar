@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 class BottomActionBarItem {
@@ -30,17 +32,17 @@ class BottomActionBarCenterItem {
   const BottomActionBarCenterItem({
     required this.child,
     this.size = 68,
-    this.top = 0,
-    this.backgroundColor = const Color(0xFF6C63FF),
-    this.borderColor = Colors.white,
-    this.borderWidth = 6,
+    this.top = -8,
+    this.backgroundColor = Colors.white,
+    this.borderColor = const Color(0xFFE5E7FF),
+    this.borderWidth = 1,
     this.padding = EdgeInsets.zero,
     this.semanticLabel,
     this.boxShadow = const [
       BoxShadow(
-        color: Color(0x33000000),
-        blurRadius: 22,
-        offset: Offset(0, 10),
+        color: Color(0x22000000),
+        blurRadius: 28,
+        offset: Offset(0, 12),
       ),
     ],
   });
@@ -56,16 +58,17 @@ class BottomActionBarCenterItem {
   final List<BoxShadow> boxShadow;
 }
 
-class CustomBottomActionBar extends StatefulWidget {
-  const CustomBottomActionBar({
+class ArbinexBottomBar extends StatefulWidget {
+  const ArbinexBottomBar({
     super.key,
     required this.items,
     this.currentIndex,
     this.initialActiveIndex = 0,
     this.onTap,
     this.centerAction,
-    this.height = 78,
-    this.horizontalPadding = 18,
+    this.height = 72,
+    this.horizontalPadding = 12,
+    this.itemVerticalPadding = const EdgeInsets.fromLTRB(8, 8, 8, 10),
     this.backgroundColor = const Color(0xFF252525),
     this.activeColor = Colors.white,
     this.inactiveColor = const Color(0xFF8F8F8F),
@@ -80,13 +83,16 @@ class CustomBottomActionBar extends StatefulWidget {
     ],
     this.showTopBorder = false,
     this.topBorderColor = const Color(0x14000000),
-    this.notchMargin = 16,
-    this.borderRadius = const BorderRadius.vertical(top: Radius.circular(24)),
+    this.notchMargin = 10,
+    this.borderRadius = const BorderRadius.vertical(top: Radius.circular(28)),
     this.itemSpacing = 4,
     this.mainAxisAlignment = MainAxisAlignment.spaceAround,
+    this.useSafeArea = true,
+    this.notchDepth = 28,
+    this.reserveBottomGap = 0,
   }) : assert(
          items.length == 2 || items.length == 4,
-         'CustomBottomActionBar supports 2 or 4 items when centerAction is separate.',
+         'ArbinexBottomBar supports 2 or 4 items when centerAction is separate.',
        ),
        assert(
          currentIndex == null ||
@@ -105,6 +111,7 @@ class CustomBottomActionBar extends StatefulWidget {
   final BottomActionBarCenterItem? centerAction;
   final double height;
   final double horizontalPadding;
+  final EdgeInsets itemVerticalPadding;
   final Color backgroundColor;
   final Color activeColor;
   final Color inactiveColor;
@@ -117,12 +124,45 @@ class CustomBottomActionBar extends StatefulWidget {
   final BorderRadius borderRadius;
   final double itemSpacing;
   final MainAxisAlignment mainAxisAlignment;
+  final bool useSafeArea;
+  final double notchDepth;
+  final double reserveBottomGap;
 
   @override
-  State<CustomBottomActionBar> createState() => _CustomBottomActionBarState();
+  State<ArbinexBottomBar> createState() => _ArbinexBottomBarState();
 }
 
-class _CustomBottomActionBarState extends State<CustomBottomActionBar> {
+@Deprecated('Use ArbinexBottomBar instead.')
+class CustomBottomActionBar extends ArbinexBottomBar {
+  const CustomBottomActionBar({
+    super.key,
+    required super.items,
+    super.currentIndex,
+    super.initialActiveIndex,
+    super.onTap,
+    super.centerAction,
+    super.height,
+    super.horizontalPadding,
+    super.itemVerticalPadding,
+    super.backgroundColor,
+    super.activeColor,
+    super.inactiveColor,
+    super.labelStyle,
+    super.activeLabelStyle,
+    super.shadow,
+    super.showTopBorder,
+    super.topBorderColor,
+    super.notchMargin,
+    super.borderRadius,
+    super.itemSpacing,
+    super.mainAxisAlignment,
+    super.useSafeArea,
+    super.notchDepth,
+    super.reserveBottomGap,
+  });
+}
+
+class _ArbinexBottomBarState extends State<ArbinexBottomBar> {
   late int _internalIndex;
 
   bool get _isControlled => widget.currentIndex != null;
@@ -136,7 +176,7 @@ class _CustomBottomActionBarState extends State<CustomBottomActionBar> {
   }
 
   @override
-  void didUpdateWidget(covariant CustomBottomActionBar oldWidget) {
+  void didUpdateWidget(covariant ArbinexBottomBar oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (!_isControlled &&
@@ -159,16 +199,22 @@ class _CustomBottomActionBarState extends State<CustomBottomActionBar> {
   @override
   Widget build(BuildContext context) {
     final centerAction = widget.centerAction;
+    final safeBottom = widget.useSafeArea
+        ? MediaQuery.paddingOf(context).bottom
+        : 0.0;
     final leftItems = widget.items.sublist(0, widget.items.length ~/ 2);
     final rightItems = widget.items.sublist(widget.items.length ~/ 2);
     final reservedCenterWidth = centerAction == null
         ? 0.0
         : centerAction.size + (widget.notchMargin * 2);
+    final buttonLift = centerAction == null
+        ? 0.0
+        : math.max(0, centerAction.size / 2 - centerAction.top.abs());
+    final totalHeight =
+        widget.height + safeBottom + widget.reserveBottomGap + buttonLift;
 
     return SizedBox(
-      height: centerAction == null
-          ? widget.height
-          : widget.height + (centerAction.size / 2) + centerAction.top.abs(),
+      height: totalHeight,
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.bottomCenter,
@@ -186,18 +232,23 @@ class _CustomBottomActionBarState extends State<CustomBottomActionBar> {
                   notchRadius: centerAction == null
                       ? 0
                       : (centerAction.size / 2) + widget.notchMargin,
+                  notchDepth: widget.notchDepth,
                   topBorderColor: widget.showTopBorder
                       ? widget.topBorderColor
                       : null,
                   borderRadius: widget.borderRadius,
                 ),
                 child: SizedBox(
-                  height: widget.height,
+                  height: widget.height + safeBottom + widget.reserveBottomGap,
                   child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: widget.horizontalPadding,
+                    padding: EdgeInsets.fromLTRB(
+                      widget.horizontalPadding,
+                      0,
+                      widget.horizontalPadding,
+                      safeBottom + widget.reserveBottomGap,
                     ),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Expanded(child: _buildItems(leftItems, 0)),
                         if (centerAction != null)
@@ -214,8 +265,11 @@ class _CustomBottomActionBarState extends State<CustomBottomActionBar> {
           ),
           if (centerAction != null)
             Positioned(
-              top: centerAction.top,
-              child: _CenterActionContainer(action: centerAction),
+              top: 0,
+              child: Transform.translate(
+                offset: Offset(0, centerAction.top),
+                child: _CenterActionContainer(action: centerAction),
+              ),
             ),
         ],
       ),
@@ -239,6 +293,7 @@ class _CustomBottomActionBarState extends State<CustomBottomActionBar> {
             labelStyle: item.inactiveLabelStyle ?? widget.labelStyle,
             activeLabelStyle: item.activeLabelStyle ?? widget.activeLabelStyle,
             itemSpacing: widget.itemSpacing,
+            itemVerticalPadding: widget.itemVerticalPadding,
             onTap: () => _handleTap(itemIndex),
           ),
         );
@@ -256,6 +311,7 @@ class _BarItemButton extends StatelessWidget {
     required this.labelStyle,
     required this.activeLabelStyle,
     required this.itemSpacing,
+    required this.itemVerticalPadding,
     required this.onTap,
   });
 
@@ -266,18 +322,20 @@ class _BarItemButton extends StatelessWidget {
   final TextStyle? labelStyle;
   final TextStyle? activeLabelStyle;
   final double itemSpacing;
+  final EdgeInsets itemVerticalPadding;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final defaultLabelStyle = TextStyle(
-      fontSize: 12,
+      fontSize: 11,
+      height: 1,
       fontWeight: FontWeight.w500,
       color: inactiveColor,
     );
     final defaultActiveLabelStyle = defaultLabelStyle.copyWith(
       color: activeColor,
-      fontWeight: FontWeight.w700,
+      fontWeight: FontWeight.w600,
     );
 
     return Semantics(
@@ -288,9 +346,9 @@ class _BarItemButton extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: itemVerticalPadding,
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
               IconTheme(
                 data: IconThemeData(
@@ -307,13 +365,16 @@ class _BarItemButton extends StatelessWidget {
                 ),
               ),
               SizedBox(height: itemSpacing),
-              Text(
-                item.label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: isSelected
-                    ? (activeLabelStyle ?? defaultActiveLabelStyle)
-                    : (labelStyle ?? defaultLabelStyle),
+              Flexible(
+                child: Text(
+                  item.label,
+                  maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.ellipsis,
+                  style: isSelected
+                      ? (activeLabelStyle ?? defaultActiveLabelStyle)
+                      : (labelStyle ?? defaultLabelStyle),
+                ),
               ),
             ],
           ),
@@ -357,6 +418,7 @@ class _BottomBarPainter extends CustomPainter {
     required this.color,
     required this.hasCenterAction,
     required this.notchRadius,
+    required this.notchDepth,
     required this.topBorderColor,
     required this.borderRadius,
   });
@@ -364,14 +426,14 @@ class _BottomBarPainter extends CustomPainter {
   final Color color;
   final bool hasCenterAction;
   final double notchRadius;
+  final double notchDepth;
   final Color? topBorderColor;
   final BorderRadius borderRadius;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = color;
     final path = _buildPath(size);
-
+    final paint = Paint()..color = color;
     canvas.drawPath(path, paint);
 
     if (topBorderColor != null) {
@@ -392,32 +454,35 @@ class _BottomBarPainter extends CustomPainter {
     final centerX = size.width / 2;
     final leftTopRadius = borderRadius.topLeft.x;
     final rightTopRadius = borderRadius.topRight.x;
+    final leftNotchStart = centerX - notchRadius - 22;
+    final rightNotchEnd = centerX + notchRadius + 22;
 
     path.moveTo(0, leftTopRadius);
     path.quadraticBezierTo(0, 0, leftTopRadius, 0);
-    path.lineTo(centerX - notchRadius - 18, 0);
+    path.lineTo(leftNotchStart, 0);
+
     path.cubicTo(
-      centerX - notchRadius + 6,
+      centerX - notchRadius + 10,
       0,
       centerX - notchRadius + 4,
-      24,
+      notchDepth,
       centerX,
-      24,
+      notchDepth,
     );
     path.cubicTo(
       centerX + notchRadius - 4,
-      24,
-      centerX + notchRadius - 6,
+      notchDepth,
+      centerX + notchRadius - 10,
       0,
-      centerX + notchRadius + 18,
+      rightNotchEnd,
       0,
     );
+
     path.lineTo(size.width - rightTopRadius, 0);
     path.quadraticBezierTo(size.width, 0, size.width, rightTopRadius);
     path.lineTo(size.width, size.height);
     path.lineTo(0, size.height);
     path.close();
-
     return path;
   }
 
@@ -426,6 +491,7 @@ class _BottomBarPainter extends CustomPainter {
     return color != oldDelegate.color ||
         hasCenterAction != oldDelegate.hasCenterAction ||
         notchRadius != oldDelegate.notchRadius ||
+        notchDepth != oldDelegate.notchDepth ||
         topBorderColor != oldDelegate.topBorderColor ||
         borderRadius != oldDelegate.borderRadius;
   }
