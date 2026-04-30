@@ -72,4 +72,29 @@ void main() {
     expect(label.softWrap, isTrue);
     expect(label.overflow, TextOverflow.visible);
   });
+
+  testWidgets('supports item padding overrides and center gap', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          bottomNavigationBar: ArbinexBottomBar(
+            minimumBottomInset: 12,
+            itemTopPadding: 4,
+            itemBottomPadding: 14,
+            centerAction: const BottomActionBarCenterItem(
+              centerActionGap: 6,
+              child: Icon(Icons.fingerprint),
+            ),
+            items: const [
+              BottomActionBarItem(icon: Icon(Icons.home), label: 'Home'),
+              BottomActionBarItem(icon: Icon(Icons.task), label: 'Tasks'),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byIcon(Icons.fingerprint), findsOneWidget);
+    expect(find.text('Home'), findsOneWidget);
+  });
 }

@@ -41,6 +41,7 @@ class BottomActionBarCenterItem {
     required this.child,
     this.size = 68,
     this.top = -8,
+    this.centerActionGap = 0,
     this.backgroundColor = Colors.white,
     this.borderColor = const Color(0xFFE5E7FF),
     this.borderWidth = 1,
@@ -58,6 +59,7 @@ class BottomActionBarCenterItem {
   final Widget child;
   final double size;
   final double top;
+  final double centerActionGap;
   final Color backgroundColor;
   final Color borderColor;
   final double borderWidth;
@@ -77,6 +79,8 @@ class ArbinexBottomBar extends StatefulWidget {
     this.height = 72,
     this.horizontalPadding = 12,
     this.itemVerticalPadding = const EdgeInsets.fromLTRB(8, 8, 8, 10),
+    this.itemTopPadding,
+    this.itemBottomPadding,
     this.backgroundColor = const Color(0xFF252525),
     this.activeColor = Colors.white,
     this.inactiveColor = const Color(0xFF8F8F8F),
@@ -96,6 +100,7 @@ class ArbinexBottomBar extends StatefulWidget {
     this.itemSpacing = 4,
     this.mainAxisAlignment = MainAxisAlignment.spaceAround,
     this.useSafeArea = true,
+    this.minimumBottomInset = 0,
     this.notchDepth = 28,
     this.reserveBottomGap = 0,
   }) : assert(
@@ -120,6 +125,8 @@ class ArbinexBottomBar extends StatefulWidget {
   final double height;
   final double horizontalPadding;
   final EdgeInsets itemVerticalPadding;
+  final double? itemTopPadding;
+  final double? itemBottomPadding;
   final Color backgroundColor;
   final Color activeColor;
   final Color inactiveColor;
@@ -133,6 +140,7 @@ class ArbinexBottomBar extends StatefulWidget {
   final double itemSpacing;
   final MainAxisAlignment mainAxisAlignment;
   final bool useSafeArea;
+  final double minimumBottomInset;
   final double notchDepth;
   final double reserveBottomGap;
 
@@ -152,6 +160,8 @@ class CustomBottomActionBar extends ArbinexBottomBar {
     super.height,
     super.horizontalPadding,
     super.itemVerticalPadding,
+    super.itemTopPadding,
+    super.itemBottomPadding,
     super.backgroundColor,
     super.activeColor,
     super.inactiveColor,
@@ -165,6 +175,7 @@ class CustomBottomActionBar extends ArbinexBottomBar {
     super.itemSpacing,
     super.mainAxisAlignment,
     super.useSafeArea,
+    super.minimumBottomInset,
     super.notchDepth,
     super.reserveBottomGap,
   });
@@ -207,17 +218,21 @@ class _ArbinexBottomBarState extends State<ArbinexBottomBar> {
   @override
   Widget build(BuildContext context) {
     final centerAction = widget.centerAction;
-    final safeBottom = widget.useSafeArea
+    final rawSafeBottom = widget.useSafeArea
         ? MediaQuery.paddingOf(context).bottom
         : 0.0;
+    final safeBottom = math.max(rawSafeBottom, widget.minimumBottomInset);
     final leftItems = widget.items.sublist(0, widget.items.length ~/ 2);
     final rightItems = widget.items.sublist(widget.items.length ~/ 2);
     final reservedCenterWidth = centerAction == null
         ? 0.0
         : centerAction.size + (widget.notchMargin * 2);
+    final centerOffset = centerAction == null
+        ? 0.0
+        : centerAction.top - centerAction.centerActionGap;
     final buttonLift = centerAction == null
         ? 0.0
-        : math.max(0, centerAction.size / 2 - centerAction.top.abs());
+        : math.max(0, centerAction.size / 2 - centerOffset.abs());
     final totalHeight =
         widget.height + safeBottom + widget.reserveBottomGap + buttonLift;
 
@@ -275,7 +290,7 @@ class _ArbinexBottomBarState extends State<ArbinexBottomBar> {
             Positioned(
               top: 0,
               child: Transform.translate(
-                offset: Offset(0, centerAction.top),
+                offset: Offset(0, centerOffset),
                 child: _CenterActionContainer(action: centerAction),
               ),
             ),
@@ -302,6 +317,8 @@ class _ArbinexBottomBarState extends State<ArbinexBottomBar> {
             activeLabelStyle: item.activeLabelStyle ?? widget.activeLabelStyle,
             itemSpacing: widget.itemSpacing,
             itemVerticalPadding: widget.itemVerticalPadding,
+            itemTopPadding: widget.itemTopPadding,
+            itemBottomPadding: widget.itemBottomPadding,
             onTap: () => _handleTap(itemIndex),
           ),
         );
@@ -320,6 +337,8 @@ class _BarItemButton extends StatelessWidget {
     required this.activeLabelStyle,
     required this.itemSpacing,
     required this.itemVerticalPadding,
+    required this.itemTopPadding,
+    required this.itemBottomPadding,
     required this.onTap,
   });
 
@@ -331,6 +350,8 @@ class _BarItemButton extends StatelessWidget {
   final TextStyle? activeLabelStyle;
   final double itemSpacing;
   final EdgeInsets itemVerticalPadding;
+  final double? itemTopPadding;
+  final double? itemBottomPadding;
   final VoidCallback onTap;
 
   @override
@@ -345,6 +366,10 @@ class _BarItemButton extends StatelessWidget {
       color: activeColor,
       fontWeight: FontWeight.w600,
     );
+    final resolvedItemPadding = itemVerticalPadding.copyWith(
+      top: itemTopPadding,
+      bottom: itemBottomPadding,
+    );
 
     return Semantics(
       button: true,
@@ -354,7 +379,7 @@ class _BarItemButton extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Padding(
-          padding: itemVerticalPadding,
+          padding: resolvedItemPadding,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
