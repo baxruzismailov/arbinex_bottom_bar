@@ -97,4 +97,53 @@ void main() {
     expect(find.byIcon(Icons.fingerprint), findsOneWidget);
     expect(find.text('Home'), findsOneWidget);
   });
+
+  testWidgets('uses automatic height when height is not provided', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          bottomNavigationBar: ArbinexBottomBar(
+            itemTopPadding: 6,
+            itemBottomPadding: 12,
+            itemSpacing: 4,
+            items: const [
+              BottomActionBarItem(
+                icon: Icon(Icons.home),
+                label: 'Home',
+                iconSize: 30,
+                labelMaxLines: 2,
+                labelSoftWrap: true,
+                activeLabelStyle: TextStyle(fontSize: 12, height: 1.2),
+              ),
+              BottomActionBarItem(icon: Icon(Icons.task), label: 'Tasks'),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    final sizedBox = tester.widgetList<SizedBox>(find.byType(SizedBox)).first;
+    expect(sizedBox.height, 80.8);
+  });
+
+  testWidgets('uses explicit height when provided', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          bottomNavigationBar: ArbinexBottomBar(
+            height: 90,
+            items: const [
+              BottomActionBarItem(icon: Icon(Icons.home), label: 'Home'),
+              BottomActionBarItem(icon: Icon(Icons.task), label: 'Tasks'),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    final sizedBox = tester.widgetList<SizedBox>(find.byType(SizedBox)).first;
+    expect(sizedBox.height, 90);
+  });
 }

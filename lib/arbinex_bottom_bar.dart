@@ -76,7 +76,7 @@ class ArbinexBottomBar extends StatefulWidget {
     this.initialActiveIndex = 0,
     this.onTap,
     this.centerAction,
-    this.height = 72,
+    this.height,
     this.horizontalPadding = 12,
     this.itemVerticalPadding = const EdgeInsets.fromLTRB(8, 8, 8, 10),
     this.itemTopPadding,
@@ -122,7 +122,7 @@ class ArbinexBottomBar extends StatefulWidget {
   final int initialActiveIndex;
   final ValueChanged<int>? onTap;
   final BottomActionBarCenterItem? centerAction;
-  final double height;
+  final double? height;
   final double horizontalPadding;
   final EdgeInsets itemVerticalPadding;
   final double? itemTopPadding;
@@ -233,8 +233,9 @@ class _ArbinexBottomBarState extends State<ArbinexBottomBar> {
     final buttonLift = centerAction == null
         ? 0.0
         : math.max(0, centerAction.size / 2 - centerOffset.abs());
+    final resolvedBarHeight = widget.height ?? _resolveAutoHeight();
     final totalHeight =
-        widget.height + safeBottom + widget.reserveBottomGap + buttonLift;
+        resolvedBarHeight + safeBottom + widget.reserveBottomGap + buttonLift;
 
     return SizedBox(
       height: totalHeight,
@@ -262,7 +263,8 @@ class _ArbinexBottomBarState extends State<ArbinexBottomBar> {
                   borderRadius: widget.borderRadius,
                 ),
                 child: SizedBox(
-                  height: widget.height + safeBottom + widget.reserveBottomGap,
+                  height:
+                      resolvedBarHeight + safeBottom + widget.reserveBottomGap,
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(
                       widget.horizontalPadding,
@@ -324,6 +326,43 @@ class _ArbinexBottomBarState extends State<ArbinexBottomBar> {
         );
       }),
     );
+  }
+
+  double _resolveAutoHeight() {
+    final topPadding = widget.itemTopPadding ?? widget.itemVerticalPadding.top;
+    final bottomPadding =
+        widget.itemBottomPadding ?? widget.itemVerticalPadding.bottom;
+    final maxIconSize = widget.items.fold<double>(
+      24,
+      (maxValue, item) => math.max(maxValue, item.iconSize),
+    );
+    final maxLabelLines = widget.items.fold<int>(
+      1,
+      (maxValue, item) => math.max(maxValue, item.labelMaxLines),
+    );
+    final defaultLabelStyle = TextStyle(
+      fontSize: 11,
+      height: 1,
+      fontWeight: FontWeight.w500,
+      color: widget.inactiveColor,
+    );
+    final maxLabelHeight = widget.items.fold<double>(11, (maxValue, item) {
+      final baseStyle =
+          item.activeLabelStyle ??
+          item.inactiveLabelStyle ??
+          widget.activeLabelStyle ??
+          widget.labelStyle ??
+          defaultLabelStyle;
+      final fontSize = baseStyle.fontSize ?? 11;
+      final heightFactor = baseStyle.height ?? 1;
+      return math.max(maxValue, fontSize * heightFactor * maxLabelLines);
+    });
+
+    return topPadding +
+        maxIconSize +
+        widget.itemSpacing +
+        maxLabelHeight +
+        bottomPadding;
   }
 }
 
