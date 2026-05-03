@@ -1,3 +1,8 @@
-## 0.0.1
+## 0.1.0
 
-* TODO: Describe initial release.
+- Initial public release.
+- Added `ArbinexBottomBar` as the main public widget.
+- Added support for center action buttons with notch controls.
+- Added multiline label support with configurable overflow behavior.
+- Added safe area, bottom inset, and item spacing controls.
+- Added automatic height calculation when `height` is not provided.
