@@ -183,4 +183,4 @@ See the [`example`](./example) app for a full usage sample.
 
 Below is an example of how `arbinex_bottom_bar` can look inside a real application UI:
 
-![Real project example](docs/images/real_project_example.png)
+![Real project example](doc/images/real_project_example.png)
