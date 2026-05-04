@@ -101,6 +101,7 @@ class ArbinexBottomBar extends StatefulWidget {
     ],
     this.showTopBorder = false,
     this.topBorderColor = const Color(0x14000000),
+    this.topBorderWidth = 1,
     this.notchMargin = 10,
     this.borderRadius = const BorderRadius.vertical(top: Radius.circular(28)),
     this.itemSpacing = 4,
@@ -141,6 +142,7 @@ class ArbinexBottomBar extends StatefulWidget {
   final List<BoxShadow> shadow;
   final bool showTopBorder;
   final Color topBorderColor;
+  final double topBorderWidth;
   final double notchMargin;
   final BorderRadius borderRadius;
   final double itemSpacing;
@@ -176,6 +178,7 @@ class CustomBottomActionBar extends ArbinexBottomBar {
     super.shadow,
     super.showTopBorder,
     super.topBorderColor,
+    super.topBorderWidth,
     super.notchMargin,
     super.borderRadius,
     super.itemSpacing,
@@ -238,7 +241,7 @@ class _ArbinexBottomBarState extends State<ArbinexBottomBar> {
         : centerAction.top - centerAction.centerActionGap;
     final topInteractiveInset = centerAction == null
         ? 0.0
-        : math.max(0, -centerOffset);
+        : math.max(0.0, -centerOffset);
     final resolvedBarHeight = widget.height ?? _resolveAutoHeight();
     final totalHeight =
         resolvedBarHeight +
@@ -269,6 +272,7 @@ class _ArbinexBottomBarState extends State<ArbinexBottomBar> {
                   topBorderColor: widget.showTopBorder
                       ? widget.topBorderColor
                       : null,
+                  topBorderWidth: widget.topBorderWidth,
                   borderRadius: widget.borderRadius,
                 ),
                 child: SizedBox(
@@ -299,7 +303,7 @@ class _ArbinexBottomBarState extends State<ArbinexBottomBar> {
           ),
           if (centerAction != null)
             Positioned(
-              top: 0,
+              top: topInteractiveInset,
               child: Transform.translate(
                 offset: Offset(0, centerOffset),
                 child: _CenterActionContainer(action: centerAction),
@@ -509,6 +513,7 @@ class _BottomBarPainter extends CustomPainter {
     required this.notchRadius,
     required this.notchDepth,
     required this.topBorderColor,
+    required this.topBorderWidth,
     required this.borderRadius,
   });
 
@@ -517,6 +522,7 @@ class _BottomBarPainter extends CustomPainter {
   final double notchRadius;
   final double notchDepth;
   final Color? topBorderColor;
+  final double topBorderWidth;
   final BorderRadius borderRadius;
 
   @override
@@ -529,7 +535,7 @@ class _BottomBarPainter extends CustomPainter {
       final borderPaint = Paint()
         ..color = topBorderColor!
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1;
+        ..strokeWidth = topBorderWidth;
       canvas.drawPath(path, borderPaint);
     }
   }
@@ -582,6 +588,7 @@ class _BottomBarPainter extends CustomPainter {
         notchRadius != oldDelegate.notchRadius ||
         notchDepth != oldDelegate.notchDepth ||
         topBorderColor != oldDelegate.topBorderColor ||
+        topBorderWidth != oldDelegate.topBorderWidth ||
         borderRadius != oldDelegate.borderRadius;
   }
 }

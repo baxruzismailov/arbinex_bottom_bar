@@ -1,3 +1,7 @@
+## 0.1.3
+
+- Added configurable top border support with `showTopBorder`, `topBorderColor`, and `topBorderWidth`.
+
 ## 0.1.2
 
 - Improved center action hit-area handling for lifted/floating center buttons.

@@ -119,6 +119,8 @@ void main() {
 
     final sizedBox = tester.widgetList<SizedBox>(find.byType(SizedBox)).first;
     expect(sizedBox.height, 89);
+    final fingerprintRect = tester.getRect(find.byIcon(Icons.fingerprint).first);
+    expect(fingerprintRect.top, greaterThanOrEqualTo(0));
   });
 
   testWidgets('uses automatic height when height is not provided', (
@@ -168,5 +170,25 @@ void main() {
 
     final sizedBox = tester.widgetList<SizedBox>(find.byType(SizedBox)).first;
     expect(sizedBox.height, 90);
+  });
+
+  testWidgets('supports configurable top border width', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          bottomNavigationBar: ArbinexBottomBar(
+            showTopBorder: true,
+            topBorderColor: Colors.red,
+            topBorderWidth: 2,
+            items: const [
+              BottomActionBarItem(icon: Icon(Icons.home), label: 'Home'),
+              BottomActionBarItem(icon: Icon(Icons.task), label: 'Tasks'),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byType(CustomPaint), findsWidgets);
   });
 }

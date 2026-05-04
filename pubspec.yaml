@@ -1,6 +1,6 @@
 name: arbinex_bottom_bar
 description: A customizable Flutter bottom navigation bar with a center action button, notch controls, spacing controls, and multiline label support.
-version: 0.1.2
+version: 0.1.3
 homepage: https://github.com/baxruzismailov/arbinex_bottom_bar
 repository: https://github.com/baxruzismailov/arbinex_bottom_bar
 issue_tracker: https://github.com/baxruzismailov/arbinex_bottom_bar/issues
