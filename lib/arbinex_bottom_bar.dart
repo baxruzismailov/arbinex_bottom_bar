@@ -535,9 +535,55 @@ class _BottomBarPainter extends CustomPainter {
       final borderPaint = Paint()
         ..color = topBorderColor!
         ..style = PaintingStyle.stroke
-        ..strokeWidth = topBorderWidth;
-      canvas.drawPath(path, borderPaint);
+        ..strokeWidth = topBorderWidth
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round;
+      // Stroke only the upper outline. Stroking the closed [path] would draw
+      // left, right, and bottom edges as well.
+      canvas.drawPath(_buildTopBorderPath(size), borderPaint);
     }
+  }
+
+  /// Open path along the visible top edge only (no left/right/bottom segments).
+  Path _buildTopBorderPath(Size size) {
+    final leftTopRadius = borderRadius.topLeft.x;
+    final rightTopRadius = borderRadius.topRight.x;
+
+    if (!hasCenterAction) {
+      final topPath = Path()
+        ..moveTo(0, leftTopRadius)
+        ..quadraticBezierTo(0, 0, leftTopRadius, 0)
+        ..lineTo(size.width - rightTopRadius, 0)
+        ..quadraticBezierTo(size.width, 0, size.width, rightTopRadius);
+      return topPath;
+    }
+
+    final centerX = size.width / 2;
+    final leftNotchStart = centerX - notchRadius - 22;
+    final rightNotchEnd = centerX + notchRadius + 22;
+
+    return Path()
+      ..moveTo(0, leftTopRadius)
+      ..quadraticBezierTo(0, 0, leftTopRadius, 0)
+      ..lineTo(leftNotchStart, 0)
+      ..cubicTo(
+        centerX - notchRadius + 10,
+        0,
+        centerX - notchRadius + 4,
+        notchDepth,
+        centerX,
+        notchDepth,
+      )
+      ..cubicTo(
+        centerX + notchRadius - 4,
+        notchDepth,
+        centerX + notchRadius - 10,
+        0,
+        rightNotchEnd,
+        0,
+      )
+      ..lineTo(size.width - rightTopRadius, 0)
+      ..quadraticBezierTo(size.width, 0, size.width, rightTopRadius);
   }
 
   Path _buildPath(Size size) {
