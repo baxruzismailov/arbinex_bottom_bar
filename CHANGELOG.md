@@ -1,3 +1,8 @@
+## 0.1.2
+
+- Improved center action hit-area handling for lifted/floating center buttons.
+- Added optional `onTap`, `onLongPress`, and `behavior` support to `BottomActionBarCenterItem`.
+
 ## 0.1.1
 
 - Reduced the README preview image size for a cleaner pub.dev package page.

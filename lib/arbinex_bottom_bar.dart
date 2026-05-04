@@ -42,6 +42,9 @@ class BottomActionBarCenterItem {
     this.size = 68,
     this.top = -8,
     this.centerActionGap = 0,
+    this.onTap,
+    this.onLongPress,
+    this.behavior = HitTestBehavior.opaque,
     this.backgroundColor = Colors.white,
     this.borderColor = const Color(0xFFE5E7FF),
     this.borderWidth = 1,
@@ -60,6 +63,9 @@ class BottomActionBarCenterItem {
   final double size;
   final double top;
   final double centerActionGap;
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+  final HitTestBehavior behavior;
   final Color backgroundColor;
   final Color borderColor;
   final double borderWidth;
@@ -230,12 +236,15 @@ class _ArbinexBottomBarState extends State<ArbinexBottomBar> {
     final centerOffset = centerAction == null
         ? 0.0
         : centerAction.top - centerAction.centerActionGap;
-    final buttonLift = centerAction == null
+    final topInteractiveInset = centerAction == null
         ? 0.0
-        : math.max(0, centerAction.size / 2 - centerOffset.abs());
+        : math.max(0, -centerOffset);
     final resolvedBarHeight = widget.height ?? _resolveAutoHeight();
     final totalHeight =
-        resolvedBarHeight + safeBottom + widget.reserveBottomGap + buttonLift;
+        resolvedBarHeight +
+        safeBottom +
+        widget.reserveBottomGap +
+        topInteractiveInset;
 
     return SizedBox(
       height: totalHeight,
@@ -467,20 +476,27 @@ class _CenterActionContainer extends StatelessWidget {
     return Semantics(
       container: true,
       label: action.semanticLabel,
-      child: Container(
-        width: action.size,
-        height: action.size,
-        padding: action.padding,
-        decoration: BoxDecoration(
-          color: action.backgroundColor,
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: action.borderColor,
-            width: action.borderWidth,
+      child: GestureDetector(
+        behavior: action.behavior,
+        onTap: action.onTap,
+        onLongPress: action.onLongPress,
+        child: Container(
+          width: action.size,
+          height: action.size,
+          padding: action.padding,
+          decoration: BoxDecoration(
+            color: action.backgroundColor,
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: action.borderColor,
+              width: action.borderWidth,
+            ),
+            boxShadow: action.boxShadow,
           ),
-          boxShadow: action.boxShadow,
+          child: SizedBox.expand(
+            child: action.child,
+          ),
         ),
-        child: Center(child: action.child),
       ),
     );
   }

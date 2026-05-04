@@ -98,6 +98,29 @@ void main() {
     expect(find.text('Home'), findsOneWidget);
   });
 
+  testWidgets('expands height for lifted center action hit area', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          bottomNavigationBar: ArbinexBottomBar(
+            centerAction: const BottomActionBarCenterItem(
+              top: -20,
+              centerActionGap: 12,
+              child: Icon(Icons.fingerprint),
+            ),
+            items: const [
+              BottomActionBarItem(icon: Icon(Icons.home), label: 'Home'),
+              BottomActionBarItem(icon: Icon(Icons.task), label: 'Tasks'),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    final sizedBox = tester.widgetList<SizedBox>(find.byType(SizedBox)).first;
+    expect(sizedBox.height, 89);
+  });
+
   testWidgets('uses automatic height when height is not provided', (
     tester,
   ) async {
