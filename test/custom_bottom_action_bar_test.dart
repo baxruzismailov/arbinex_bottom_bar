@@ -98,7 +98,9 @@ void main() {
     expect(find.text('Home'), findsOneWidget);
   });
 
-  testWidgets('expands height for lifted center action hit area', (tester) async {
+  testWidgets('expands height for lifted center action hit area', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -119,7 +121,9 @@ void main() {
 
     final sizedBox = tester.widgetList<SizedBox>(find.byType(SizedBox)).first;
     expect(sizedBox.height, 89);
-    final fingerprintRect = tester.getRect(find.byIcon(Icons.fingerprint).first);
+    final fingerprintRect = tester.getRect(
+      find.byIcon(Icons.fingerprint).first,
+    );
     expect(fingerprintRect.top, greaterThanOrEqualTo(0));
   });
 

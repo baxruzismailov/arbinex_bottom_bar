@@ -418,10 +418,17 @@ class _BarItemButton extends StatelessWidget {
       color: activeColor,
       fontWeight: FontWeight.w600,
     );
+    final resolvedLabelStyle = isSelected
+        ? (activeLabelStyle ?? defaultActiveLabelStyle)
+        : (labelStyle ?? defaultLabelStyle);
     final resolvedItemPadding = itemVerticalPadding.copyWith(
       top: itemTopPadding,
       bottom: itemBottomPadding,
     );
+    final reservedLabelHeight =
+        (resolvedLabelStyle.fontSize ?? 11) *
+        (resolvedLabelStyle.height ?? 1) *
+        item.labelMaxLines;
 
     return Semantics(
       button: true,
@@ -433,6 +440,7 @@ class _BarItemButton extends StatelessWidget {
         child: Padding(
           padding: resolvedItemPadding,
           child: Column(
+            mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               IconTheme(
@@ -450,16 +458,18 @@ class _BarItemButton extends StatelessWidget {
                 ),
               ),
               SizedBox(height: itemSpacing),
-              Flexible(
-                child: Text(
-                  item.label,
-                  textAlign: item.labelTextAlign,
-                  maxLines: item.labelMaxLines,
-                  softWrap: item.labelSoftWrap,
-                  overflow: item.labelOverflow,
-                  style: isSelected
-                      ? (activeLabelStyle ?? defaultActiveLabelStyle)
-                      : (labelStyle ?? defaultLabelStyle),
+              SizedBox(
+                height: reservedLabelHeight,
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Text(
+                    item.label,
+                    textAlign: item.labelTextAlign,
+                    maxLines: item.labelMaxLines,
+                    softWrap: item.labelSoftWrap,
+                    overflow: item.labelOverflow,
+                    style: resolvedLabelStyle,
+                  ),
                 ),
               ),
             ],
@@ -497,9 +507,7 @@ class _CenterActionContainer extends StatelessWidget {
             ),
             boxShadow: action.boxShadow,
           ),
-          child: SizedBox.expand(
-            child: action.child,
-          ),
+          child: SizedBox.expand(child: action.child),
         ),
       ),
     );
