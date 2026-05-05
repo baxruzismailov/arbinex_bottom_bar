@@ -2,6 +2,15 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+double _measureLabelHeight(TextStyle style, int maxLines) {
+  final painter = TextPainter(
+    text: TextSpan(text: 'Ag', style: style),
+    textDirection: TextDirection.ltr,
+    maxLines: 1,
+  )..layout();
+  return painter.preferredLineHeight * maxLines;
+}
+
 class BottomActionBarItem {
   const BottomActionBarItem({
     required this.icon,
@@ -366,9 +375,7 @@ class _ArbinexBottomBarState extends State<ArbinexBottomBar> {
           widget.activeLabelStyle ??
           widget.labelStyle ??
           defaultLabelStyle;
-      final fontSize = baseStyle.fontSize ?? 11;
-      final heightFactor = baseStyle.height ?? 1;
-      return math.max(maxValue, fontSize * heightFactor * maxLabelLines);
+      return math.max(maxValue, _measureLabelHeight(baseStyle, maxLabelLines));
     });
 
     return topPadding +
@@ -425,10 +432,10 @@ class _BarItemButton extends StatelessWidget {
       top: itemTopPadding,
       bottom: itemBottomPadding,
     );
-    final reservedLabelHeight =
-        (resolvedLabelStyle.fontSize ?? 11) *
-        (resolvedLabelStyle.height ?? 1) *
-        item.labelMaxLines;
+    final reservedLabelHeight = _measureLabelHeight(
+      resolvedLabelStyle,
+      item.labelMaxLines,
+    );
 
     return Semantics(
       button: true,

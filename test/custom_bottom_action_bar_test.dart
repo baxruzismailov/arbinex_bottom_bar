@@ -154,7 +154,7 @@ void main() {
     );
 
     final sizedBox = tester.widgetList<SizedBox>(find.byType(SizedBox)).first;
-    expect(sizedBox.height, 80.8);
+    expect(sizedBox.height, 80);
   });
 
   testWidgets('uses explicit height when provided', (tester) async {
